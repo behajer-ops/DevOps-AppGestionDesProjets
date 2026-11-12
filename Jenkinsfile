@@ -4,7 +4,7 @@ pipeline {
         stage('Git clone') {
             steps {
                 git branch: 'main',
-                    credentialsId: 'GIT_HUB_CREDENTIALS',
+                    credentialsId: 'GIT-HUB-CREDENTIALS',
                     url: 'https://github.com/behajer-ops/DevOps-AppGestionDesProjets.git'
             }
         }
@@ -15,3 +15,4 @@ pipeline {
         }
     }
 }
+
