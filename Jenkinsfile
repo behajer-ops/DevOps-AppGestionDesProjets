@@ -23,5 +23,23 @@ pipeline {
                 }
             }
         }
+        stage('Docker Build & Push') {
+            steps {
+                script {
+                    // --- Backend ---
+                    docker.withRegistry('', 'docker-hub-credentials') {
+                        def backendImage = docker.build("behajer/backend-devops:${env.BUILD_NUMBER}", "./backend")
+                        backendImage.push()
+                        backendImage.push('latest')
+                    }
+                    // --- Frontend ---
+                    docker.withRegistry('', 'docker-hub-credentials') {
+                        def frontendImage = docker.build("behajer/frontend-devops:${env.BUILD_NUMBER}", "./frontend")
+                        frontendImage.push()
+                        frontendImage.push('latest')
+                    }
+                }
+            }
+        }
     }
 }
