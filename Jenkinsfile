@@ -19,21 +19,37 @@ pipeline {
             steps {
                 dir('frontend') {
                     sh 'npm ci'
-                    // Ajout de la limite de mémoire pour éviter le crash de Node
                     sh 'NODE_OPTIONS="--max-old-space-size=4096" npm run build -- --configuration production'
+                }
+            }
+        }
+        stage('SonarQube Analysis') {
+            steps {
+                script {
+                    // Analyse du Backend
+                    dir('backend') {
+                        withSonarQubeEnv('SonarQube') {
+                            sh 'mvn sonar:sonar'
+                        }
+                    }
+                    // Analyse du Frontend
+                    dir('frontend') {
+                        withSonarQubeEnv('SonarQube') {
+                            // Le scanner utilise sonar-project.properties
+                            sh 'npx sonar-scanner'
+                        }
+                    }
                 }
             }
         }
         stage('Docker Build & Push') {
             steps {
                 script {
-                    // --- Backend ---
                     docker.withRegistry('', 'docker-hub-credentials') {
                         def backendImage = docker.build("behajer/backend-devops:${env.BUILD_NUMBER}", "./backend")
                         backendImage.push()
                         backendImage.push('latest')
                     }
-                    // --- Frontend ---
                     docker.withRegistry('', 'docker-hub-credentials') {
                         def frontendImage = docker.build("behajer/frontend-devops:${env.BUILD_NUMBER}", "./frontend")
                         frontendImage.push()
