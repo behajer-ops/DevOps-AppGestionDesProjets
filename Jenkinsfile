@@ -19,7 +19,8 @@ pipeline {
             steps {
                 dir('frontend') {
                     sh 'npm ci'
-                    sh 'npm run build -- --configuration production'
+                    // Ajout de la limite de mémoire pour éviter le crash de Node
+                    sh 'NODE_OPTIONS="--max-old-space-size=4096" npm run build -- --configuration production'
                 }
             }
         }
