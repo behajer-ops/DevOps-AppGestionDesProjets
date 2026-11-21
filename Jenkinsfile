@@ -58,5 +58,27 @@ pipeline {
                 }
             }
         }
+        stage('Deploy to Kubernetes') {
+            steps {
+                withKubeConfig(credentialsId: 'minikube-kubeconfig') {
+                    script {
+                        // 1. Applique tous les manifestes YAML (Deployments, Services, Ingress)
+                        sh 'kubectl apply -f k8s/'
+                        
+                        // 2. Force le redémarrage des pods pour prendre la nouvelle image 'latest'
+                        sh 'kubectl rollout restart deployment backend-deployment'
+                        sh 'kubectl rollout restart deployment frontend-deployment'
+                        
+                        // 3. Attend que le déploiement soit terminé
+                        sh 'kubectl rollout status deployment backend-deployment --timeout=120s'
+                        sh 'kubectl rollout status deployment frontend-deployment --timeout=120s'
+                        
+                        // 4. Affiche l'état final
+                        sh 'kubectl get pods'
+                        sh 'kubectl get ingress'
+                    }
+                }
+            }
+        }
     }
 }
