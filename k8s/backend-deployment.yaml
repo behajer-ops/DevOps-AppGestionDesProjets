@@ -17,7 +17,7 @@ spec:
       containers:
       - name: backend
         image: behajer/backend-devops:latest
-        imagePullPolicy: Never
+        imagePullPolicy: Always
         ports:
         - containerPort: 8080
         env:

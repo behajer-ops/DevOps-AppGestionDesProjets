@@ -17,6 +17,6 @@ spec:
       containers:
       - name: frontend
         image: behajer/frontend-devops:latest
-        imagePullPolicy: Never
+        imagePullPolicy: Always
         ports:
         - containerPort: 80
